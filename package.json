@@ -7,6 +7,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "highcharts": "^7.0.3",
+    "prerender-spa-plugin": "^3.4.0",
     "vue": "^2.6.6",
     "vuex": "^3.0.1"
   },
