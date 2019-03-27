@@ -3,11 +3,26 @@
     <!-- <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <div ref="chart"></div>
+    <div class="canvas"  :style="{ 'background-image': 'url(' + blah + ')' }" ref="my-node">
+      <h1>{{ message }}</h1>
+      <div class="frame">
+        <form id="form1" runat="server">
+          <div class="demo"></div>
+          <!-- <img id="blah" :src="blah" alt="your image"/> -->
+        </form>
+      </div>
+    </div>
+    <input type='file' id="imgInp" ref="image" @change="imgHandler" />
+    <button class="download-btn" @click="recordImage">點我下載</button>
+    <input type="text" name="message" v-model="message">
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import domtoimage from 'dom-to-image';
+import FileSaver from 'file-saver'
+
 var Highcharts = require('highcharts');
 
 // Load module after Highcharts is loaded
@@ -19,6 +34,9 @@ export default {
   name: 'app',
   data () {
     return {
+      imgURL: '',
+      blah: '',
+      message: '請輸入你想要的話',
       // pigInfo: {
       //   credits: {
       //     enabled: false
@@ -163,6 +181,7 @@ export default {
     HelloWorld
   },
   mounted () {
+  
     var easeOutBounce = function (pos) {
         if ((pos) < (1 / 2.75)) {
             return (7.5625 * pos * pos);
@@ -182,6 +201,53 @@ export default {
     let conf = {  }
     Highcharts.chart(vm.$refs['chart'], this.pigInfo2)
   console.log(Highcharts)
+  },
+  methods: {
+    imgHandler () {
+      this.readURL(this.$refs['image']);
+    },
+    readURL(input) {
+      let vm = this
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          vm.blah = e.target.result
+        }
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    },
+    handleCanvas () {
+      var canvas = this.$refs['canvas']
+      var ctx = canvas.getContext("2d");
+      
+
+      // ctx.fillStyle = "green"
+      // ctx.fillRect(10, 10, 100, 100)
+      this.handleDrawImg(ctx)
+      
+    },
+    handleDrawImg (pen) {
+      var img = new Image();
+      img.onload = function(){
+        pen.drawImage(img,0,0, 100, 50);
+        // pen.beginPath();
+        // pen.moveTo(30,96);
+        // pen.lineTo(70,66);
+        // pen.lineTo(103,76);
+        // pen.lineTo(170,15);
+        // pen.stroke();
+      };
+      img.src = require('../public/image/getImage.jpg');
+    },
+    recordImage () {
+      
+      domtoimage.toBlob(this.$refs['my-node'])
+        .then(function (blob) {
+            FileSaver.saveAs(blob, 'my-node.png');
+        });
+    }
   },
   computed: {
     easeOutBounce: function (pos) {
@@ -214,7 +280,24 @@ export default {
   max-width: 800px;
   margin: 0 auto;
 }
-
+  .canvas {
+    width: 500px;
+    height: 500px;
+    border: solid 1px blue;
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: -100px -100px;
+    h1 {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+    }
+    .demo {
+      
+    }
+  }
 /* Link the series colors to axis colors */
   .highcharts-color-0 {
     fill: rgb(253, 215, 228);
@@ -240,6 +323,13 @@ export default {
 
   .highcharts-yaxis .highcharts-axis-line {
     stroke-width: 2px;
+  }
+  .download-btn {
+    width: 80px;
+    height: 30px;
+    border: 0px;
+    background-color: pink;
+    border-radius: 5px;
   }
 }
 </style>
